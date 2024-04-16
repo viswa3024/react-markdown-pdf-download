@@ -135,6 +135,33 @@ This is a simple example of using \`react-markdown\` with \`remark-gfm\`.
 
   const handleDownload = async () => {
     try {
+      const response = await fetch('/api/generate-pdf', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ markdownText }),
+      });
+  
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+  
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      const fileName = `Response-${Math.floor(new Date().valueOf() * Math.random())}.pdf`;
+      link.setAttribute('download', fileName);
+      document.body.appendChild(link);
+      link.click();
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+    }
+  };
+
+  const handleDownloadAxios = async () => {
+    try {
       const response = await axios.post('/api/generate-pdf', { markdownText }, { responseType: 'blob' });
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement('a');
